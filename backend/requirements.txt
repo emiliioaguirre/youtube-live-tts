@@ -1,0 +1,15 @@
+# Web framework
+fastapi>=0.100.0,<1.0.0
+pydantic>=2.0.0,<3.0.0
+uvicorn>=0.23.0,<1.0.0
+httpx>=0.24.0,<1.0.0
+
+# YouTube chat
+pytchat>=0.5.5,<1.0.0
+
+# Text-to-Speech
+elevenlabs>=2.27.0,<3.0.0
+
+# Audio playback
+sounddevice>=0.4.6,<1.0.0
+soundfile>=0.12.1,<1.0.0

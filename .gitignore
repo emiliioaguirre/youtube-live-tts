@@ -1,0 +1,39 @@
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local config
+config.py
+.env
+.env.local
+
+# Development tools
+.specstory/
+.mcp.json
+.cursorindexingignore
+.claude/
+
+# Next.js
+frontend/.next/
+frontend/out/
+frontend/node_modules/
+
+# Build outputs
+dist/
+build/
