@@ -21,9 +21,9 @@ logger = logging.getLogger(__name__)
 
 def extract_video_id(url_or_id: str) -> str:
     patterns = [
-        r'(?:youtube\.com\/live\/)([a-zA-Z0-9_-]{11})',
-        r'(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})',
-        r'(?:youtu\.be\/)([a-zA-Z0-9_-]{11})',
+        r"(?:youtube\.com\/live\/)([a-zA-Z0-9_-]{11})",
+        r"(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})",
+        r"(?:youtu\.be\/)([a-zA-Z0-9_-]{11})",
     ]
     for pattern in patterns:
         match = re.search(pattern, url_or_id)
@@ -44,11 +44,11 @@ def is_valid_message(
     tts_prefix: str,
     max_message_length: int,
     user_cooldowns: dict,
-    cooldown_seconds: int
+    cooldown_seconds: int,
 ) -> bool:
     if tts_prefix and not text.lower().startswith(tts_prefix.lower()):
         return False
-    content = text[len(tts_prefix):].strip() if tts_prefix else text.strip()
+    content = text[len(tts_prefix) :].strip() if tts_prefix else text.strip()
     if not content:
         return False
     if len(content) > max_message_length:
@@ -63,7 +63,7 @@ def extract_text_only(message_parts: list) -> str:
     for part in message_parts:
         if isinstance(part, str):
             text_parts.append(part)
-    return ' '.join(''.join(text_parts).split()).strip()
+    return " ".join("".join(text_parts).split()).strip()
 
 
 async def speaker_loop(bot_status, message_queue, config, eleven_client):
@@ -79,19 +79,24 @@ async def speaker_loop(bot_status, message_queue, config, eleven_client):
                 config.voice_id,
                 config.model_id,
                 config.speed,
-                text
+                text,
             )
             if audio:
                 await asyncio.to_thread(play_audio, audio, config.volume)
                 bot_status.messages_read += 1
-                await broadcast("message_read", {"author": author, "total": bot_status.messages_read})
+                await broadcast(
+                    "message_read",
+                    {"author": author, "total": bot_status.messages_read},
+                )
         except asyncio.TimeoutError:
             continue
         except Exception as e:
             logger.error(f"Speaker loop error: {e}")
 
 
-async def listener_loop(bot_status, message_queue, config, message_history, user_cooldowns):
+async def listener_loop(
+    bot_status, message_queue, config, message_history, user_cooldowns
+):
     video_id = extract_video_id(config.video_id)
 
     while bot_status.running:
@@ -120,10 +125,10 @@ async def listener_loop(bot_status, message_queue, config, message_history, user
                         timestamp=datetime.now().strftime("%H:%M:%S"),
                         was_read=False,
                         avatar_url=avatar_url,
-                        is_owner=getattr(c.author, 'isOwner', False),
-                        is_moderator=getattr(c.author, 'isModerator', False),
-                        is_member=getattr(c.author, 'isChatSponsor', False),
-                        is_verified=getattr(c.author, 'isVerified', False),
+                        is_owner=getattr(c.author, "isOwner", False),
+                        is_moderator=getattr(c.author, "isModerator", False),
+                        is_member=getattr(c.author, "isChatSponsor", False),
+                        is_verified=getattr(c.author, "isVerified", False),
                     )
 
                     if is_valid_message(
@@ -132,16 +137,17 @@ async def listener_loop(bot_status, message_queue, config, message_history, user
                         config.tts_prefix,
                         config.max_message_length,
                         user_cooldowns,
-                        config.cooldown_seconds
+                        config.cooldown_seconds,
                     ):
                         tts_text = extract_text_only(message_parts)
-                        if config.tts_prefix and tts_text.lower().startswith(config.tts_prefix.lower()):
-                            tts_text = tts_text[len(config.tts_prefix):].strip()
+                        if config.tts_prefix and tts_text.lower().startswith(
+                            config.tts_prefix.lower()
+                        ):
+                            tts_text = tts_text[len(config.tts_prefix) :].strip()
 
                         if tts_text:
                             formatted = config.tts_template.format(
-                                author=author_name,
-                                message=tts_text
+                                author=author_name, message=tts_text
                             )
                             try:
                                 await message_queue.put_nowait((author_name, formatted))
@@ -149,7 +155,9 @@ async def listener_loop(bot_status, message_queue, config, message_history, user
                                 bot_status.queue_size = message_queue.qsize()
                                 msg.was_read = True
                                 logger.debug(f"Queued: {formatted[:50]}...")
-                                await broadcast("queue_update", {"size": bot_status.queue_size})
+                                await broadcast(
+                                    "queue_update", {"size": bot_status.queue_size}
+                                )
                             except Exception as e:
                                 logger.warning(f"Queue full, skipping message: {e}")
                     else:
@@ -161,7 +169,9 @@ async def listener_loop(bot_status, message_queue, config, message_history, user
 
                     await broadcast("new_message", msg.model_dump())
 
-                await asyncio.sleep(POLL_INTERVAL_ACTIVE if has_messages else POLL_INTERVAL_IDLE)
+                await asyncio.sleep(
+                    POLL_INTERVAL_ACTIVE if has_messages else POLL_INTERVAL_IDLE
+                )
 
             bot_status.connected = False
             await broadcast("status", {"connected": False})

@@ -21,7 +21,9 @@ def play_audio(audio_bytes: bytes, volume: float = 1.0) -> None:
         logger.error(f"Audio playback failed: {e}")
 
 
-def text_to_speech(client, voice_id: str, model_id: str, speed: float, text: str) -> Optional[bytes]:
+def text_to_speech(
+    client, voice_id: str, model_id: str, speed: float, text: str
+) -> Optional[bytes]:
     if not client:
         return None
     try:
@@ -34,7 +36,7 @@ def text_to_speech(client, voice_id: str, model_id: str, speed: float, text: str
                 stability=VOICE_STABILITY,
                 similarity_boost=VOICE_SIMILARITY,
                 speed=speed,
-            )
+            ),
         )
         return b"".join(audio)
     except Exception as e:

@@ -20,6 +20,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectAttemptRef = useRef(0);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const connectRef = useRef<(() => void) | null>(null);
   const {
     setMessages,
     addMessage,
@@ -81,7 +82,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           MAX_RECONNECT_DELAY
         );
         reconnectAttemptRef.current += 1;
-        reconnectTimeoutRef.current = setTimeout(connect, delay);
+        reconnectTimeoutRef.current = setTimeout(() => connectRef.current?.(), delay);
       } else {
         setWsConnectionState("disconnected");
       }
@@ -91,6 +92,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
     wsRef.current = ws;
   }, [setMessages, addMessage, setStatus, setWsConnected, setWsConnectionState, updateStats]);
+
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   useEffect(() => {
     connect();
