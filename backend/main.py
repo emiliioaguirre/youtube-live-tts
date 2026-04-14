@@ -15,7 +15,7 @@ from services.youtube import listener_loop, speaker_loop
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%H:%M:%S"
+    datefmt="%H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
@@ -30,8 +30,10 @@ bot_task: Optional[asyncio.Task] = None
 
 async def run_bot():
     await asyncio.gather(
-        listener_loop(bot_status, message_queue, config, message_history, user_cooldowns),
-        speaker_loop(bot_status, message_queue, config, eleven_client)
+        listener_loop(
+            bot_status, message_queue, config, message_history, user_cooldowns
+        ),
+        speaker_loop(bot_status, message_queue, config, eleven_client),
     )
 
 
@@ -82,11 +84,13 @@ async def update_config(new_config: Config):
             async with httpx.AsyncClient(timeout=10.0) as client:
                 response = await client.get(
                     "https://api.elevenlabs.io/v1/voices",
-                    headers={"xi-api-key": new_config.elevenlabs_api_key}
+                    headers={"xi-api-key": new_config.elevenlabs_api_key},
                 )
                 api_key_valid = response.status_code == 200
                 if not api_key_valid:
-                    logger.warning(f"ElevenLabs API validation failed: status={response.status_code}")
+                    logger.warning(
+                        f"ElevenLabs API validation failed: status={response.status_code}"
+                    )
         except httpx.TimeoutException:
             logger.error("ElevenLabs API validation timeout")
             api_key_valid = None
@@ -141,7 +145,7 @@ async def get_voices():
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 "https://api.elevenlabs.io/v1/voices",
-                headers={"xi-api-key": config.elevenlabs_api_key}
+                headers={"xi-api-key": config.elevenlabs_api_key},
             )
             if response.status_code == 200:
                 data = response.json()
@@ -175,7 +179,7 @@ async def get_library_voices(filters: VoiceFilters):
             response = await client.get(
                 "https://api.elevenlabs.io/v1/shared-voices",
                 headers={"xi-api-key": config.elevenlabs_api_key},
-                params=params
+                params=params,
             )
             if response.status_code == 200:
                 data = response.json()
@@ -196,14 +200,21 @@ async def get_library_voices(filters: VoiceFilters):
                             "locale": v.get("locale"),
                             "use_case": v.get("use_case"),
                             "description": v.get("description") or v.get("descriptive"),
-                        }
+                        },
                     }
                     for v in voices
                 ]
-                return {"voices": normalized_voices, "has_more": data.get("has_more", False)}
+                return {
+                    "voices": normalized_voices,
+                    "has_more": data.get("has_more", False),
+                }
             else:
                 logger.error(f"Voices API error: {response.status_code}")
-                return {"error": f"Failed to fetch voices: {response.status_code}", "voices": [], "has_more": False}
+                return {
+                    "error": f"Failed to fetch voices: {response.status_code}",
+                    "voices": [],
+                    "has_more": False,
+                }
     except Exception as e:
         logger.error(f"Voices API exception: {e}")
         return {"error": str(e), "voices": [], "has_more": False}
@@ -220,13 +231,15 @@ async def websocket_endpoint(websocket: WebSocket):
     websocket_clients.append(websocket)
 
     try:
-        await websocket.send_json({
-            "event": "connected",
-            "data": {
-                "status": bot_status.model_dump(),
-                "history": [m.model_dump() for m in message_history[-20:]]
+        await websocket.send_json(
+            {
+                "event": "connected",
+                "data": {
+                    "status": bot_status.model_dump(),
+                    "history": [m.model_dump() for m in message_history[-20:]],
+                },
             }
-        })
+        )
 
         while True:
             await websocket.receive_text()
@@ -237,4 +250,5 @@ async def websocket_endpoint(websocket: WebSocket):
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

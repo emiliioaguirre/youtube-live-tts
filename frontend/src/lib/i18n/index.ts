@@ -39,7 +39,7 @@ export function useTranslation() {
   const { language, setLanguage } = useLanguageStore();
 
   const t = (key: TranslationKey): string => {
-    return translations[language][key] || translations.en[key] || key;
+    return (translations[language] as Record<TranslationKey, string>)[key] || translations.en[key] || key;
   };
 
   return { t, language, setLanguage };
