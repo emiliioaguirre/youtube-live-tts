@@ -14,7 +14,7 @@ from config import (
     RECONNECT_DELAY,
 )
 from .websocket import broadcast
-from .tts import text_to_speech, play_audio
+from .tts import play_audio
 
 logger = logging.getLogger(__name__)
 
@@ -66,21 +66,16 @@ def extract_text_only(message_parts: list) -> str:
     return " ".join("".join(text_parts).split()).strip()
 
 
-async def speaker_loop(bot_status, message_queue, config, eleven_client):
+async def speaker_loop(bot_status, message_queue, config, provider):
     while bot_status.running:
         try:
             author, text = await asyncio.wait_for(message_queue.get(), timeout=1.0)
             bot_status.queue_size = message_queue.qsize()
             await broadcast("queue_update", {"size": bot_status.queue_size})
 
-            audio = await asyncio.to_thread(
-                text_to_speech,
-                eleven_client,
-                config.voice_id,
-                config.model_id,
-                config.speed,
-                text,
-            )
+            audio = None
+            if provider:
+                audio = await provider.synthesize(text, config.voice_id, config.speed)
             if audio:
                 await asyncio.to_thread(play_audio, audio, config.volume)
                 bot_status.messages_read += 1

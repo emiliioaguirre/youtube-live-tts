@@ -29,13 +29,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     setWsConnectionState,
     updateStats,
     fetchStatus,
+    fetchServerInfo,
     loadConfigFromStorage,
   } = useDashboardStore();
 
   useEffect(() => {
     loadConfigFromStorage();
     fetchStatus();
-  }, [loadConfigFromStorage, fetchStatus]);
+    fetchServerInfo();
+  }, [loadConfigFromStorage, fetchStatus, fetchServerInfo]);
 
   const connect = useCallback(() => {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
