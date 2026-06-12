@@ -11,7 +11,7 @@ Let your chat speak for itself. Real-time text-to-speech for YouTube live stream
 ## Features
 
 - **Real-time chat monitoring:**  Watch messages flow in as they happen
-- **AI-powered voices:** High-quality TTS with ElevenLabs API
+- **AI-powered voices:** High-quality TTS with ElevenLabs or 60db, switchable from the dashboard
 - **Modern web dashboard:** Configure and monitor from your browser
 - **Customizable templates:** Set your own "{author} says: {message}" format
 - **Smart message queue:** Prevents audio overlap
@@ -81,10 +81,24 @@ cd frontend && bun install && cd ..
 bun dev
 ```
 
+## TTS Providers
+
+The bot speaks through a pluggable TTS provider, selectable from the dashboard:
+
+- **ElevenLabs** (default) — enter your API key and voice ID directly in the dashboard.
+- **60db** — set `SIXTYDB_API_KEY` in the backend environment (e.g. `backend/.env`),
+  then pick **60db** in the dashboard and paste a 60db voice ID. The dashboard shows
+  whether the server key is detected. Optional overrides: `SIXTYDB_WS_URL`,
+  `SIXTYDB_VOICE_ID`, `SIXTYDB_SAMPLE_RATE` (see `backend/.env.example`).
+
+Both providers are interchangeable behind a common interface (`backend/services/providers/`),
+so the rest of the app doesn't care which one is active.
+
 ## Built With
 
 - [pytchat](https://github.com/taizan-hokuto/pytchat) - Open-source python tchat for basic text communications
 - [ElevenLabs](https://elevenlabs.io) - AI Text-to-Speech
+- [60db](https://60db.ai) - AI Text-to-Speech (alternative provider)
 - [FastAPI](https://fastapi.tiangolo.com) - Python backend
 - [Next.js](https://nextjs.org) - React framework
 - [shadcn/ui](https://ui.shadcn.com) - UI components

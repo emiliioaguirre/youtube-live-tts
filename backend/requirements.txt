@@ -10,6 +10,9 @@ pytchat>=0.5.5,<1.0.0
 # Text-to-Speech
 elevenlabs>=2.40.0,<3.0.0
 
+# 60db TTS (websocket client)
+websockets>=12.0,<16.0
+
 # Audio playback
 sounddevice>=0.5.0,<1.0.0
 soundfile>=0.12.1,<1.0.0

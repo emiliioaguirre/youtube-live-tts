@@ -5,12 +5,12 @@ from typing import Optional
 import httpx
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from elevenlabs.client import ElevenLabs
 
 from models import Config, BotStatus, VoiceFilters
 from config import MAX_QUEUE_SIZE, CORS_ORIGINS
 from services.websocket import websocket_clients
 from services.youtube import listener_loop, speaker_loop
+from services.providers import TTSProvider, build_provider, sixtydb_api_key
 
 logging.basicConfig(
     level=logging.INFO,
@@ -24,7 +24,7 @@ bot_status = BotStatus()
 message_history = []
 message_queue = asyncio.Queue(maxsize=MAX_QUEUE_SIZE)
 user_cooldowns: dict[str, float] = {}
-eleven_client: Optional[ElevenLabs] = None
+tts_provider: Optional[TTSProvider] = None
 bot_task: Optional[asyncio.Task] = None
 
 
@@ -33,7 +33,7 @@ async def run_bot():
         listener_loop(
             bot_status, message_queue, config, message_history, user_cooldowns
         ),
-        speaker_loop(bot_status, message_queue, config, eleven_client),
+        speaker_loop(bot_status, message_queue, config, tts_provider),
     )
 
 
@@ -61,6 +61,7 @@ async def get_status():
 @app.get("/api/config")
 async def get_config():
     return {
+        "tts_provider": config.tts_provider,
         "voice_id": config.voice_id,
         "model_id": config.model_id,
         "video_id": config.video_id,
@@ -71,13 +72,17 @@ async def get_config():
         "speed": config.speed,
         "volume": config.volume,
         "has_api_key": bool(config.elevenlabs_api_key),
+        # 60db's key lives in the server environment, not the frontend.
+        "has_sixtydb_key": bool(sixtydb_api_key()),
     }
 
 
 @app.post("/api/config")
 async def update_config(new_config: Config):
-    global config, eleven_client
+    global config, tts_provider
 
+    # Validate the ElevenLabs key whenever one is supplied (provider-independent
+    # so the UI's key indicator works regardless of the active provider).
     api_key_valid = None
     if new_config.elevenlabs_api_key:
         try:
@@ -98,23 +103,27 @@ async def update_config(new_config: Config):
             logger.error(f"ElevenLabs API validation error: {e}")
 
     config = new_config
-    if config.elevenlabs_api_key and api_key_valid:
-        eleven_client = ElevenLabs(api_key=config.elevenlabs_api_key)
+    tts_provider = build_provider(config)
 
     return {"success": True, "api_key_valid": api_key_valid}
 
 
 @app.post("/api/start")
 async def start_bot():
-    global bot_task, eleven_client
+    global bot_task, tts_provider
 
     if bot_status.running:
         return {"error": "Bot already running"}
 
-    if not config.elevenlabs_api_key or not config.video_id:
-        return {"error": "Missing API key or video ID"}
+    if not config.video_id:
+        return {"error": "Missing video ID"}
 
-    eleven_client = ElevenLabs(api_key=config.elevenlabs_api_key)
+    tts_provider = build_provider(config)
+    if tts_provider is None:
+        if config.tts_provider == "60db":
+            return {"error": "SIXTYDB_API_KEY is not configured on the server"}
+        return {"error": "Missing API key"}
+
     bot_status.running = True
     bot_status.messages_read = 0
     bot_task = asyncio.create_task(run_bot())

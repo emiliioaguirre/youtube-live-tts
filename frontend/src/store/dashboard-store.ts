@@ -22,7 +22,10 @@ export interface ChatMessage {
   is_verified?: boolean;
 }
 
+export type TtsProvider = "elevenlabs" | "60db";
+
 export interface Config {
+  tts_provider: TtsProvider;
   elevenlabs_api_key: string;
   voice_id: string;
   video_id: string;
@@ -59,6 +62,7 @@ interface DashboardStore {
   wsConnectionState: WsConnectionState;
   stats: Stat[];
   isLoading: boolean;
+  hasSixtydbKey: boolean;
 
   // Actions
   setMessages: (messages: ChatMessage[]) => void;
@@ -72,6 +76,7 @@ interface DashboardStore {
   startBot: () => Promise<void>;
   stopBot: () => Promise<void>;
   fetchStatus: () => Promise<void>;
+  fetchServerInfo: () => Promise<void>;
   loadConfigFromStorage: () => void;
   reset: () => void;
 }
@@ -79,6 +84,7 @@ interface DashboardStore {
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const defaultConfig: Config = {
+  tts_provider: "elevenlabs",
   elevenlabs_api_key: "",
   voice_id: "FGY2WhTYpPnrIDTdsKH5",
   video_id: "",
@@ -106,6 +112,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   wsConnected: false,
   wsConnectionState: "disconnected" as WsConnectionState,
   isLoading: false,
+  hasSixtydbKey: false,
   stats: [
     { id: "1", value: 0, icon: "messages" },
     { id: "2", value: 0, icon: "queue" },
@@ -229,6 +236,20 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to fetch status:', error);
+    }
+  },
+
+  fetchServerInfo: async () => {
+    // The 60db key lives in the backend environment, so the UI learns whether
+    // it's configured from the server rather than from local config.
+    try {
+      const res = await fetch(`${API_URL}/api/config`);
+      if (res.ok) {
+        const data = await res.json();
+        set({ hasSixtydbKey: Boolean(data.has_sixtydb_key) });
+      }
+    } catch (error) {
+      console.error('Failed to fetch server info:', error);
     }
   },
 

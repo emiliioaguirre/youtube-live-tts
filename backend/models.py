@@ -1,7 +1,10 @@
+from typing import Literal
+
 from pydantic import BaseModel, field_validator
 
 
 class Config(BaseModel):
+    tts_provider: Literal["elevenlabs", "60db"] = "elevenlabs"
     elevenlabs_api_key: str = ""
     voice_id: str = "FGY2WhTYpPnrIDTdsKH5"
     model_id: str = "eleven_flash_v2_5"
