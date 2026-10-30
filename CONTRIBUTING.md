@@ -36,7 +36,13 @@ chore: maintenance tasks
 ### Pull Request Process
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+2. Start from the latest `development` and create a feature branch:
+   ```bash
+   git fetch origin
+   git switch development
+   git pull --ff-only origin development
+   git switch -c feat/amazing-feature
+   ```
 3. Make your changes
 4. Run linting and type checks:
    ```bash
@@ -47,7 +53,17 @@ chore: maintenance tasks
    ```
 5. Commit your changes using conventional commits
 6. Push to your fork
-7. Open a Pull Request
+7. Open a Pull Request targeting `development`
+
+### Branches and Maintenance
+
+- `main` contains changes that have been reviewed and promoted from `development`.
+- `development` is the integration branch for features, fixes, and dependency updates. Keep it after release PRs are merged.
+- CI runs on pushes and pull requests targeting either branch. Before merging, frontend lint, type checks, build, and backend lint/format checks must pass, and at least one review approval is required.
+- Promote reviewed changes with a pull request from `development` to `main`. Use a merge commit for release PRs so both long-lived branches retain shared history; squash merges are suitable for feature PRs into `development`. Sync `development` with `main` after releases or urgent fixes.
+- Dependabot is configured to check Bun dependencies in `/frontend`, pip requirements in `/backend`, and GitHub Actions every Monday at 09:00 in `America/Mexico_City`. Version-update PRs target `development`; minor and patch updates are grouped per ecosystem, while major updates remain separate for review.
+- The Dependabot configuration must exist on the default branch (`main`) before scheduled version updates can start. This schedule creates proposals; dependency changes still need review and merging.
+- Dependabot security updates, when enabled in repository settings, target the default branch. Bring those fixes back into `development` as well.
 
 ### Pull Request Guidelines
 

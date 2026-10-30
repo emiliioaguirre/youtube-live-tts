@@ -41,7 +41,6 @@ export function SettingsCard() {
 
     // If empty or too short, save but don't validate
     if (!apiKey || apiKey.length < 20) {
-      setApiKeyValid(null);
       apiKeyDebounceRef.current = setTimeout(() => {
         useDashboardStore.getState().saveConfig();
       }, 800);
