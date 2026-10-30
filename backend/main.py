@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from elevenlabs.client import ElevenLabs
 
 from models import Config, BotStatus, VoiceFilters
-from config import MAX_QUEUE_SIZE, CORS_ORIGINS
+from runtime_settings import MAX_QUEUE_SIZE, CORS_ORIGINS
 from services.websocket import websocket_clients
 from services.youtube import listener_loop, speaker_loop
 

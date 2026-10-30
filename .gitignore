@@ -30,9 +30,10 @@ config.py
 .claude/
 
 # Next.js
-frontend/.next/
+frontend/.next
 frontend/out/
 frontend/node_modules/
+**/*.nosync/
 
 # Build outputs
 dist/
