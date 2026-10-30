@@ -42,6 +42,7 @@ La cola funciona como una fila frente a un micrófono. Varios mensajes pueden ll
 | `dev.ts` | Arranca frontend y backend con Bun. |
 | `.github/workflows/ci.yml` | Verificaciones automáticas de frontend y Python. |
 | `.github/dependabot.yml` | Propuestas periódicas de actualización de dependencias. |
+| `backend/requirements-dev.txt` y `ruff.toml` | Versión de Ruff compartida con CI y reglas explícitas del proyecto. |
 
 ## Dos programas y dos formas de comunicarse
 
@@ -86,6 +87,7 @@ Python utiliza rangos en `backend/requirements.txt` y todavía no tiene un lockf
 
 ```bash
 # Desde la raíz
+python3.12 -m pip install -r backend/requirements-dev.txt
 ruff check backend/
 ruff format --check backend/
 
@@ -109,3 +111,5 @@ Estos comandos comprueban reglas estáticas, tipos y compilación. No prueban qu
 La lección práctica es comprobar el recorrido que interesa. Una actualización puede compilar correctamente y todavía necesitar una prueba con audio. Una automatización puede tener YAML válido y todavía necesitar que su configuración llegue a la rama que GitHub utiliza para activarla.
 
 Durante la verificación aparecieron dos problemas concretos. Las carpetas `.nosync` estaban entrando al análisis de TypeScript y ESLint como si fueran código de la aplicación; se excluyeron de ambos y de Git. También el linter actualizado detectó un `setApiKeyValid(null)` síncrono dentro de un efecto: se retiró esa llamada duplicada porque el `onChange` del campo ya reinicia el indicador. La corrección conserva el guardado diferido y las llamadas de validación existentes.
+
+La primera ejecución remota reveló otra diferencia: GitHub instalaba Ruff 0.17.3 sin fijar su versión, mientras que la máquina local usaba 0.15.17. La ejecución remota aplicó reglas adicionales y falló sobre código que pasaba localmente. `requirements-dev.txt` fija la versión comprobada 0.15.17 y `ruff.toml` declara la base de reglas que ya se utilizaba. Dependabot puede proponer actualizaciones de esa herramienta junto con los requisitos de Python. La herramienta que verifica el código también forma parte del entorno que debe poder reproducirse.

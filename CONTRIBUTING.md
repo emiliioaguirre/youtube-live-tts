@@ -12,6 +12,7 @@ Follow the [Quick Start](README.md#quick-start) guide to set up your development
 
 **Backend (Python)**
 - Formatted with [Ruff](https://docs.astral.sh/ruff/)
+- Install development tools with `python3.12 -m pip install -r backend/requirements-dev.txt` to use the same Ruff version as CI. The lint baseline is declared in `ruff.toml`.
 - Use type hints where possible
 
 **Frontend (TypeScript/React)**
