@@ -71,7 +71,7 @@ powershell -c "irm bun.sh/install.ps1 | iex"
 git clone https://github.com/emiliioaguirre/youtube-live-tts.git
 cd youtube-live-tts
 
-pip3 install -r backend/requirements.txt
+python3.12 -m pip install -r backend/requirements.txt
 cd frontend && bun install && cd ..
 ```
 
@@ -80,6 +80,15 @@ cd frontend && bun install && cd ..
 ```bash
 bun dev
 ```
+
+The backend includes versioned defaults, so a fresh clone does not need a private
+`backend/config.py`. Existing local configuration files remain supported as
+overrides. Without a local override, CORS allows `http://localhost:3000`; set the
+`CORS_ORIGINS` environment variable to a comma-separated list to change it.
+The backend does not automatically load `.env` files.
+
+For development checks, regression tests, and dependency audits, see
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Built With
 

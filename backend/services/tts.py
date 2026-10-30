@@ -6,7 +6,7 @@ import sounddevice as sd
 import soundfile as sf
 from elevenlabs import VoiceSettings
 
-from config import VOICE_STABILITY, VOICE_SIMILARITY
+from runtime_settings import VOICE_STABILITY, VOICE_SIMILARITY
 
 logger = logging.getLogger(__name__)
 
