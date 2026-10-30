@@ -7,7 +7,7 @@ from datetime import datetime
 import pytchat
 
 from models import ChatMessage
-from config import (
+from runtime_settings import (
     MAX_MESSAGE_HISTORY,
     POLL_INTERVAL_ACTIVE,
     POLL_INTERVAL_IDLE,
@@ -150,7 +150,7 @@ async def listener_loop(
                                 author=author_name, message=tts_text
                             )
                             try:
-                                await message_queue.put_nowait((author_name, formatted))
+                                message_queue.put_nowait((author_name, formatted))
                                 user_cooldowns[author_id] = time.time()
                                 bot_status.queue_size = message_queue.qsize()
                                 msg.was_read = True
@@ -158,7 +158,7 @@ async def listener_loop(
                                 await broadcast(
                                     "queue_update", {"size": bot_status.queue_size}
                                 )
-                            except Exception as e:
+                            except asyncio.QueueFull as e:
                                 logger.warning(f"Queue full, skipping message: {e}")
                     else:
                         logger.debug(f"Skipped message from {author_name}")

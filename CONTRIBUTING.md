@@ -47,7 +47,13 @@ chore: maintenance tasks
 3. Make your changes
 4. Run linting and type checks:
    ```bash
+   python3.12 -m pip install -r backend/requirements-dev.txt
+   ruff check backend/
+   ruff format --check backend/
+   pip-audit
+   (cd backend && python3.12 -m unittest discover -s tests -v)
    cd frontend
+   bun audit
    bun run lint
    bun run typecheck
    bun run build
@@ -60,10 +66,11 @@ chore: maintenance tasks
 
 - `main` contains changes that have been reviewed and promoted from `development`.
 - `development` is the integration branch for features, fixes, and dependency updates. Keep it after release PRs are merged.
-- CI runs on pushes and pull requests targeting either branch. Before merging, frontend lint, type checks, build, and backend lint/format checks must pass, and at least one review approval is required.
+- CI runs on pushes and pull requests targeting either branch. Before merging, frontend lint, type checks, build, dependency audits, and backend lint/format and regression checks must pass, and at least one review approval is required.
 - Promote reviewed changes with a pull request from `development` to `main`. Use a merge commit for release PRs so both long-lived branches retain shared history; squash merges are suitable for feature PRs into `development`. Sync `development` with `main` after releases or urgent fixes.
 - Dependabot is configured to check Bun dependencies in `/frontend`, pip requirements in `/backend`, and GitHub Actions every Monday at 09:00 in `America/Mexico_City`. Version-update PRs target `development`; minor and patch updates are grouped per ecosystem, while major updates remain separate for review.
 - The Dependabot configuration must exist on the default branch (`main`) before scheduled version updates can start. This schedule creates proposals; dependency changes still need review and merging.
+- CI also runs dependency audits and regression checks every Monday at 09:00 in Mexico City, even without new commits, and supports manual runs. Scheduled workflow runs start once the workflow is on `main`.
 - Dependabot security updates, when enabled in repository settings, target the default branch. Bring those fixes back into `development` as well.
 
 ### Pull Request Guidelines
