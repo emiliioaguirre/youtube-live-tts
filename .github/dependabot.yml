@@ -1,0 +1,51 @@
+# GitHub reads this file from main, even when updates target development.
+version: 2
+updates:
+  - package-ecosystem: bun
+    directory: /frontend
+    target-branch: development
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Mexico_City
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      frontend-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: pip
+    directory: /backend
+    target-branch: development
+    versioning-strategy: increase
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Mexico_City
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      backend-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: development
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Mexico_City
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: chore(deps)
+    groups:
+      actions-minor-and-patch:
+        patterns: ["*"]
+        update-types: [minor, patch]

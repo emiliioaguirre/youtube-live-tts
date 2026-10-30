@@ -1,0 +1,3 @@
+[lint]
+# Keep the project's existing baseline explicit across Ruff upgrades.
+select = ["E4", "E7", "E9", "F"]

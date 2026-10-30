@@ -2,9 +2,16 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, development]
   pull_request:
-    branches: [main]
+    branches: [main, development]
+  schedule:
+    # Monday at 09:00 in Mexico City, including weeks without new commits.
+    - cron: '0 15 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   frontend:
@@ -17,13 +24,16 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Audit dependencies
+        run: bun audit
 
       - name: Lint
         run: bun run lint
@@ -40,22 +50,34 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
-          python-version: '3.11'
+          python-version: '3.12'
           cache: 'pip'
+          cache-dependency-path: |
+            backend/requirements.txt
+            backend/requirements-dev.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
-          pip install ruff
+          pip install -r backend/requirements-dev.txt
+
+      - name: Install audio system libraries
+        run: sudo apt-get update && sudo apt-get install -y libportaudio2 libsndfile1
+
+      - name: Audit dependencies
+        run: pip-audit
 
       - name: Lint with Ruff
         run: ruff check backend/
 
       - name: Check formatting
         run: ruff format --check backend/
+
+      - name: Backend regression tests
+        working-directory: backend
+        run: python -m unittest discover -s tests -v
