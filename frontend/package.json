@@ -13,7 +13,8 @@
   },
   "packageManager": "bun@1.4.4",
   "overrides": {
-    "@typescript-eslint/typescript-estree>minimatch": "11.0.4"
+    "@typescript-eslint/typescript-estree>minimatch": "11.0.4",
+    "minimatch@^10": "11.0.4"
   },
   "dependencies": {
     "@number-flow/react": "^0.6.2",
@@ -46,7 +47,7 @@
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "eslint": "^9.39.5",
+    "eslint": "^10.14.0",
     "eslint-config-next": "16.4.3",
     "sharp": "0.35.5",
     "tailwindcss": "^4.3.3",
