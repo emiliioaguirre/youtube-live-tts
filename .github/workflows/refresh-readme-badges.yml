@@ -1,0 +1,31 @@
+name: Refresh README badges
+
+# GitHub caches README images for up to an hour. When CI runs, the cached CI
+# badge gets stuck on "pending", so purge the cache once CI on main finishes.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  purge:
+    name: Purge badge cache
+    runs-on: ubuntu-latest
+    steps:
+      # shieldcn keeps GitHub API data for 10 minutes, so wait until it
+      # sees the finished run before asking GitHub to fetch the badge again.
+      - name: Wait for shieldcn data to expire
+        if: github.event_name == 'workflow_run'
+        run: sleep 660
+
+      - name: Purge GitHub image cache
+        run: |
+          curl -fsSL "https://github.com/${{ github.repository }}" \
+            | grep -oE 'https://camo\.githubusercontent\.com/[a-f0-9]+/[a-f0-9]+' \
+            | sort -u \
+            | xargs -r -n1 curl -fsS -o /dev/null -X PURGE

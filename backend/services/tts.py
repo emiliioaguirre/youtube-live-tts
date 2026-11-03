@@ -2,7 +2,6 @@ import io
 import logging
 from typing import Optional
 
-import sounddevice as sd
 import soundfile as sf
 from elevenlabs import VoiceSettings
 
@@ -13,6 +12,10 @@ logger = logging.getLogger(__name__)
 
 def play_audio(audio_bytes: bytes, volume: float = 1.0) -> None:
     try:
+        # Imported here because sounddevice initializes PortAudio on import,
+        # which crashes the whole backend on machines without an audio server.
+        import sounddevice as sd
+
         data, samplerate = sf.read(io.BytesIO(audio_bytes))
         data = data * volume
         sd.play(data, samplerate)

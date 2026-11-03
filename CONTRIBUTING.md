@@ -16,6 +16,7 @@ Follow the [Quick Start](README.md#quick-start) guide to set up your development
 - Use type hints where possible
 
 **Frontend (TypeScript/React)**
+- Type checks run TypeScript 7 through the `@typescript/native` alias. ESLint and Next.js use the TypeScript 6 API compatibility package under `typescript`, following [Microsoft's side-by-side setup](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0). Keep both aliases: the native compiler provides `tsc`, while the compatibility package provides `tsc6` and the API required by plugins.
 - Use functional components with hooks
 - Follow the existing component patterns
 - Use Tailwind CSS for styling
@@ -53,7 +54,8 @@ chore: maintenance tasks
    pip-audit
    (cd backend && python3.12 -m unittest discover -s tests -v)
    cd frontend
-   bun audit
+   bun run test:audit
+   bun run audit
    bun run lint
    bun run typecheck
    bun run build
@@ -64,13 +66,15 @@ chore: maintenance tasks
 
 ### Branches and Maintenance
 
+- Use Bun 1.4.4, the same version as CI and the frontend `packageManager` field.
+- `bun run audit` ignores one known false positive: [GHSA-g3hv-75wg-m249](https://github.com/isaacs/minimatch/security/advisories/GHSA-g3hv-75wg-m249) on minimatch 3.1.5, which ESLint plugins still require. Any other finding fails the audit. Remove the exception once those plugins upgrade minimatch.
 - `main` contains changes that have been reviewed and promoted from `development`.
 - `development` is the integration branch for features, fixes, and dependency updates. Keep it after release PRs are merged.
-- CI runs on pushes and pull requests targeting either branch. Before merging, frontend lint, type checks, build, dependency audits, and backend lint/format and regression checks must pass, and at least one review approval is required.
+- CI runs on pushes and pull requests targeting either branch. Before merging, frontend lint, type checks, build, dependency audits, and backend lint, format and tests must pass, and at least one review approval is required.
 - Promote reviewed changes with a pull request from `development` to `main`. Use a merge commit for release PRs so both long-lived branches retain shared history; squash merges are suitable for feature PRs into `development`. Sync `development` with `main` after releases or urgent fixes.
 - Dependabot is configured to check Bun dependencies in `/frontend`, pip requirements in `/backend`, and GitHub Actions every Monday at 09:00 in `America/Mexico_City`. Version-update PRs target `development`; minor and patch updates are grouped per ecosystem, while major updates remain separate for review.
 - The Dependabot configuration must exist on the default branch (`main`) before scheduled version updates can start. This schedule creates proposals; dependency changes still need review and merging.
-- CI also runs dependency audits and regression checks every Monday at 09:00 in Mexico City, even without new commits, and supports manual runs. Scheduled workflow runs start once the workflow is on `main`.
+- CI also runs dependency audits and tests every Monday at 09:00 in Mexico City, even without new commits, and supports manual runs. Scheduled workflow runs start once the workflow is on `main`.
 - Dependabot security updates, when enabled in repository settings, target the default branch. Bring those fixes back into `development` as well.
 
 ### Pull Request Guidelines
