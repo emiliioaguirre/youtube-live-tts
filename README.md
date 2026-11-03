@@ -2,6 +2,13 @@
 
 Let your chat speak for itself. Real-time text-to-speech for YouTube live streams, powered by ElevenLabs.
 
+<p align="center">
+  <a href="https://docs.python.org/3.12/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/Python-3.12.svg?variant=secondary&amp;logo=python&amp;mode=dark" /><img alt="Python 3.12" src="https://shieldcn.dev/badge/Python-3.12.svg?variant=secondary&amp;logo=python&amp;mode=light" /></picture></a>
+  <a href="https://bun.sh/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/runtime-Bun.svg?variant=secondary&amp;logo=bun&amp;mode=dark" /><img alt="Bun runtime" src="https://shieldcn.dev/badge/runtime-Bun.svg?variant=secondary&amp;logo=bun&amp;mode=light" /></picture></a>
+  <a href="https://elevenlabs.io/"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/voices-ElevenLabs.svg?variant=secondary&amp;logo=elevenlabs&amp;mode=dark" /><img alt="ElevenLabs voices" src="https://shieldcn.dev/badge/voices-ElevenLabs.svg?variant=secondary&amp;logo=elevenlabs&amp;mode=light" /></picture></a>
+  <a href="./LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/license-Apache%202.0.svg?variant=secondary&amp;mode=dark" /><img alt="Apache License 2.0" src="https://shieldcn.dev/badge/license-Apache%202.0.svg?variant=secondary&amp;mode=light" /></picture></a>
+</p>
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="frontend/public/cover-dark.png">
   <source media="(prefers-color-scheme: light)" srcset="frontend/public/cover-light.png">
