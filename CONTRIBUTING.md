@@ -16,6 +16,7 @@ Follow the [Quick Start](README.md#quick-start) guide to set up your development
 - Use type hints where possible
 
 **Frontend (TypeScript/React)**
+- Type checks run TypeScript 7 through the `@typescript/native` alias. ESLint and Next.js use the TypeScript 6 API compatibility package under `typescript`, following [Microsoft's side-by-side setup](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0). Keep both aliases: the native compiler provides `tsc`, while the compatibility package provides `tsc6` and the API required by plugins.
 - Use functional components with hooks
 - Follow the existing component patterns
 - Use Tailwind CSS for styling
