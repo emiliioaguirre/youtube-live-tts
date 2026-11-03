@@ -7,7 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "audit": "bun ../scripts/audit-frontend.mjs",
+    "test:audit": "bun test ../scripts/audit-frontend.test.mjs",
     "typecheck": "tsc --noEmit"
+  },
+  "packageManager": "bun@1.4.4",
+  "overrides": {
+    "@typescript-eslint/typescript-estree>minimatch": "11.0.4",
+    "minimatch@^10": "11.0.4"
   },
   "dependencies": {
     "@number-flow/react": "^0.6.2",
