@@ -16,6 +16,7 @@ Follow the [Quick Start](README.md#quick-start) guide to set up your development
 - Use type hints where possible
 
 **Frontend (TypeScript/React)**
+- Type checks run TypeScript 7 through the `@typescript/native` alias. ESLint and Next.js use the TypeScript 6 API compatibility package under `typescript`, following [Microsoft's side-by-side setup](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6.0). Keep both aliases: the native compiler provides `tsc`, while the compatibility package provides `tsc6` and the API required by plugins.
 - Use functional components with hooks
 - Follow the existing component patterns
 - Use Tailwind CSS for styling
@@ -53,7 +54,8 @@ chore: maintenance tasks
    pip-audit
    (cd backend && python3.12 -m unittest discover -s tests -v)
    cd frontend
-   bun audit
+   bun run test:audit
+   bun run audit
    bun run lint
    bun run typecheck
    bun run build
@@ -63,6 +65,9 @@ chore: maintenance tasks
 7. Open a Pull Request targeting `development`
 
 ### Branches and Maintenance
+
+- Use Bun 1.4.4, matching CI and the frontend `packageManager` field. The lockfile uses a parent-scoped override to update the parser's minimatch dependency without replacing the older API required by ESLint plugins.
+- `bun run audit` runs the registry audit and retains all findings except the documented false positive for GHSA-g3hv-75wg-m249 on exactly minimatch 3.1.5. The [maintainer's advisory](https://github.com/isaacs/minimatch/security/advisories/GHSA-g3hv-75wg-m249) identifies the optimization code in 10.2.6; that code is absent from 3.1.5. The affected parser dependency is separately upgraded to 11.0.4. The exception fails closed if another legacy version, an affected version, another advisory or an unreadable audit response appears. Regression tests exercise those cases. Remove the exception when the advisory range or plugin dependencies are corrected upstream.
 
 - `main` contains changes that have been reviewed and promoted from `development`.
 - `development` is the integration branch for features, fixes, and dependency updates. Keep it after release PRs are merged.
