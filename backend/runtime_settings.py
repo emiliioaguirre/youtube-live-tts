@@ -1,6 +1,9 @@
 """Versioned defaults, with the existing private config.py kept as an override."""
 
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 __all__ = [
     "MAX_QUEUE_SIZE",
@@ -12,6 +15,9 @@ __all__ = [
     "RECONNECT_DELAY",
     "CORS_ORIGINS",
 ]
+
+# Shell variables win over backend/.env.
+load_dotenv(Path(__file__).with_name(".env"))
 
 try:
     from config import (

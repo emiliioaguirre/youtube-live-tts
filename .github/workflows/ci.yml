@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, development]
+    branches: [main]
   pull_request:
     branches: [main, development]
   schedule:
@@ -28,12 +28,14 @@ jobs:
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
       - name: Audit dependencies
-        run: bun audit
+        run: bun run test:audit && bun run audit
 
       - name: Lint
         run: bun run lint
@@ -78,6 +80,6 @@ jobs:
       - name: Check formatting
         run: ruff format --check backend/
 
-      - name: Backend regression tests
+      - name: Backend tests
         working-directory: backend
         run: python -m unittest discover -s tests -v
