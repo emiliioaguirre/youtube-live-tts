@@ -1,51 +1,31 @@
 # GitHub reads this file from main, even when updates target development.
+# One weekly PR covering frontend, backend and GitHub Actions together.
 version: 2
+
+multi-ecosystem-groups:
+  weekly-deps:
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/Mexico_City
+    target-branch: development
+    commit-message:
+      prefix: chore(deps)
+
 updates:
   - package-ecosystem: bun
     directory: /frontend
-    target-branch: development
-    schedule:
-      interval: weekly
-      day: monday
-      time: "09:00"
-      timezone: America/Mexico_City
-    open-pull-requests-limit: 5
-    commit-message:
-      prefix: chore(deps)
-    groups:
-      frontend-minor-and-patch:
-        patterns: ["*"]
-        update-types: [minor, patch]
+    patterns: ["*"]
+    multi-ecosystem-group: weekly-deps
 
   - package-ecosystem: pip
     directory: /backend
-    target-branch: development
     versioning-strategy: increase
-    schedule:
-      interval: weekly
-      day: monday
-      time: "09:00"
-      timezone: America/Mexico_City
-    open-pull-requests-limit: 5
-    commit-message:
-      prefix: chore(deps)
-    groups:
-      backend-minor-and-patch:
-        patterns: ["*"]
-        update-types: [minor, patch]
+    patterns: ["*"]
+    multi-ecosystem-group: weekly-deps
 
   - package-ecosystem: github-actions
     directory: /
-    target-branch: development
-    schedule:
-      interval: weekly
-      day: monday
-      time: "09:00"
-      timezone: America/Mexico_City
-    open-pull-requests-limit: 5
-    commit-message:
-      prefix: chore(deps)
-    groups:
-      actions-minor-and-patch:
-        patterns: ["*"]
-        update-types: [minor, patch]
+    patterns: ["*"]
+    multi-ecosystem-group: weekly-deps
